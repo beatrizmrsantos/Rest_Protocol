@@ -58,7 +58,7 @@ public class DirectoryResource implements RestDirectory {
         //randomServer(f, filename, data);
 
         String uri = f.toString();
-        uri.concat("/"+userId+"/"+filename);
+        uri.concat("/files/"+userId+"/"+filename);
 
         HashSet<String> set = new HashSet<>();
         FileInfo i = new FileInfo(userId,filename,uri,set);
@@ -283,6 +283,8 @@ public class DirectoryResource implements RestDirectory {
                     foundFile = true;
                     uri = file.getFileURL();
 
+                    System.out.println(69);
+
                     if (!checkUserAccessability(accUserId, file)) {
                         Log.info("User does not have permission to see file.");
                         throw new WebApplicationException( Status.FORBIDDEN);
@@ -291,6 +293,8 @@ public class DirectoryResource implements RestDirectory {
                 }
             }
         }
+
+        System.out.println(userfiles.get(userId).get(0));
 
         if (!foundFile) {
             Log.info("File does not exist.");
