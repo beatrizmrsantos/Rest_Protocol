@@ -5,6 +5,7 @@ import java.util.*;
 import java.util.logging.Logger;
 import java.util.Set;
 
+import com.fasterxml.jackson.databind.ser.std.StringSerializer;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.WebApplicationException;
 import jakarta.ws.rs.core.Response;
@@ -78,7 +79,8 @@ public class DirectoryResource implements RestDirectory {
 
         userfiles.get(userId).add(i);
 
-        files1.writeFile(filename,data, null);
+        String name = String.format("%s/%s", userId, filename);
+        files1.writeFile(name, data,null);
 
         return i;
     }
