@@ -155,3 +155,5 @@ public interface RestDirectory {
 	@Path("/{userId}")
 	void deleteUserAndFiles(@PathParam("userId") String userId, @QueryParam("password") String password);
 }
+
+

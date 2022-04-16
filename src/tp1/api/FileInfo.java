@@ -3,9 +3,6 @@ package tp1.api;
 import java.util.Objects;
 import java.util.Set;
 
-import java.util.Objects;
-import java.util.Set;
-
 /**
  * Represents a File in the system
  */

@@ -124,7 +124,7 @@ public class DirectoryResource implements RestDirectory {
 
             for (int i = 0; i < filesUser.size(); i++) {
                 FileInfo file = filesUser.get(i);
-                if (file.getFilename().equalsIgnoreCase(filename)) {
+                if (file.getFilename().equalsIgnoreCase(String.format("%s/%s", userId, filename))) {
                     for (int j = 0; j < f.length; j++) {
 
                         String uriS = f[j].toString().concat("/" + userId + "/" + filename);
@@ -137,7 +137,7 @@ public class DirectoryResource implements RestDirectory {
             RestFilesClient files = new RestFilesClient(f[uriCorrect]);
 
             for (FileInfo file: userfiles.get(userId)) {
-                if(file.getFilename().equalsIgnoreCase(filename)){
+                if(file.getFilename().equalsIgnoreCase(String.format("%s/%s", userId, filename))){
 
                     files.deleteFile(filename, null);
 
@@ -177,7 +177,7 @@ public class DirectoryResource implements RestDirectory {
 
         boolean found = false;
         for (FileInfo file: userfiles.get(userId)) {
-            if(file.getFilename().equalsIgnoreCase(filename)){
+            if(file.getFilename().equalsIgnoreCase(String.format("%s/%s", userId, filename))){
 
                 Set<String> shared = file.getSharedWith();
                 shared.add(userIdShare);
@@ -226,7 +226,7 @@ public class DirectoryResource implements RestDirectory {
 
         boolean found = false;
         for (FileInfo file: userfiles.get(userId)) {
-            if(file.getFilename().equalsIgnoreCase(filename)){
+            if(file.getFilename().equalsIgnoreCase(String.format("%s/%s", userId, filename))){
 
                 Set<String> shared = file.getSharedWith();
                 shared.remove(userIdShare);
@@ -279,7 +279,7 @@ public class DirectoryResource implements RestDirectory {
             for (int i = 0; i < filesUser.size(); i++) {
                 FileInfo file = filesUser.get(i);
 
-                if (file.getFilename().equalsIgnoreCase(filename)) {
+                if (file.getFilename().equalsIgnoreCase(String.format("%s/%s", userId, filename))) {
                     foundFile = true;
                     uri = file.getFileURL();
 
