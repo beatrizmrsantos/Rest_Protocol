@@ -61,7 +61,7 @@ public class DirectoryResource implements RestDirectory {
         uri.concat("/files/"+userId+"/"+filename);
 
         HashSet<String> set = new HashSet<>();
-        FileInfo i = new FileInfo(userId,filename,uri,set);
+        FileInfo i = new FileInfo(userId, filename, uri, set);
 
 
         if(userfiles.containsKey(userId)){
@@ -80,7 +80,7 @@ public class DirectoryResource implements RestDirectory {
         userfiles.get(userId).add(i);
 
         String name = String.format("%s/%s", userId, filename);
-        files1.writeFile(name, data,null);
+        files1.writeFile(name, data,"");
 
         return i;
     }
@@ -124,10 +124,10 @@ public class DirectoryResource implements RestDirectory {
 
             for (int i = 0; i < filesUser.size(); i++) {
                 FileInfo file = filesUser.get(i);
-                if (file.getFilename().equalsIgnoreCase(String.format("%s/%s", userId, filename))) {
+                if (file.getFilename().equalsIgnoreCase(filename)) {
                     for (int j = 0; j < f.length; j++) {
 
-                        String uriS = f[j].toString().concat("/" + userId + "/" + filename);
+                        String uriS = f[j].toString().concat("/files/" + userId + "/" + filename);
                         if (file.getFileURL().equalsIgnoreCase(uriS)) {
                             uriCorrect = j;
                         }
@@ -137,9 +137,9 @@ public class DirectoryResource implements RestDirectory {
             RestFilesClient files = new RestFilesClient(f[uriCorrect]);
 
             for (FileInfo file: userfiles.get(userId)) {
-                if(file.getFilename().equalsIgnoreCase(String.format("%s/%s", userId, filename))){
+                if(file.getFilename().equalsIgnoreCase(filename)){
 
-                    files.deleteFile(filename, null);
+                    files.deleteFile(String.format("%s/%s", userId, filename), "");
 
                     userfiles.get(userId).remove(file);
                 }
@@ -159,6 +159,7 @@ public class DirectoryResource implements RestDirectory {
 
         User user = r.getUser(userId, password);
 
+        /*
         List<User> l = r.searchUsers(userIdShare);
         boolean b = false;
 
@@ -168,7 +169,7 @@ public class DirectoryResource implements RestDirectory {
         if (!b) {
             Log.info("UserShared does not exist.");
             throw new WebApplicationException( Status.NOT_FOUND);
-        }
+        }*/
 
         if(filename == null) {
             Log.info("fileId is invalid.");
@@ -177,7 +178,7 @@ public class DirectoryResource implements RestDirectory {
 
         boolean found = false;
         for (FileInfo file: userfiles.get(userId)) {
-            if(file.getFilename().equalsIgnoreCase(String.format("%s/%s", userId, filename))){
+            if(file.getFilename().equalsIgnoreCase(filename)){
 
                 Set<String> shared = file.getSharedWith();
                 shared.add(userIdShare);
@@ -208,6 +209,7 @@ public class DirectoryResource implements RestDirectory {
 
         User user = r.getUser(userId, password);
 
+        /*
         List<User> l = r.searchUsers(userIdShare);
         boolean b = false;
 
@@ -217,7 +219,7 @@ public class DirectoryResource implements RestDirectory {
         if (!b) {
             Log.info("UserShared does not exist.");
             throw new WebApplicationException( Status.NOT_FOUND);
-        }
+        }*/
 
         if(filename == null) {
             Log.info("fileId is invalid.");
@@ -226,7 +228,7 @@ public class DirectoryResource implements RestDirectory {
 
         boolean found = false;
         for (FileInfo file: userfiles.get(userId)) {
-            if(file.getFilename().equalsIgnoreCase(String.format("%s/%s", userId, filename))){
+            if(file.getFilename().equalsIgnoreCase(filename)){
 
                 Set<String> shared = file.getSharedWith();
                 shared.remove(userIdShare);
@@ -279,11 +281,9 @@ public class DirectoryResource implements RestDirectory {
             for (int i = 0; i < filesUser.size(); i++) {
                 FileInfo file = filesUser.get(i);
 
-                if (file.getFilename().equalsIgnoreCase(String.format("%s/%s", userId, filename))) {
+                if (file.getFilename().equalsIgnoreCase(filename)) {
                     foundFile = true;
                     uri = file.getFileURL();
-
-                    System.out.println(69);
 
                     if (!checkUserAccessability(accUserId, file)) {
                         Log.info("User does not have permission to see file.");
@@ -294,8 +294,6 @@ public class DirectoryResource implements RestDirectory {
             }
         }
 
-        System.out.println(userfiles.get(userId).get(0));
-
         if (!foundFile) {
             Log.info("File does not exist.");
             throw new WebApplicationException( Status.NOT_FOUND);
@@ -304,9 +302,14 @@ public class DirectoryResource implements RestDirectory {
         //RestFilesClient files = new RestFilesClient(f[uriCorrect]);
         //return files.getFile(filename, null);
 
+        if(uri != null){
+            uri.substring(0, uri.length() - 3);
+        }
+
         throw new WebApplicationException(Response.temporaryRedirect(URI.create(uri)).build());
 
     }
+
 
     private boolean checkUserAccessability(String userId, FileInfo file){
         Set<String> list = file.getSharedWith();
