@@ -84,7 +84,9 @@ public class DirectoryResource implements RestDirectory {
         userfiles.get(userId).add(i);
 
         String name = String.format("%s/%s", userId, filename);
-        files1.writeFile(name, data,"");
+        System.out.println("faz pedido");
+
+        files1.writeFile(name, data,null);
 
         return i;
     }
