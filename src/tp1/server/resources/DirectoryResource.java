@@ -8,6 +8,7 @@ import java.util.Set;
 import com.fasterxml.jackson.databind.ser.std.StringSerializer;
 import jakarta.inject.Singleton;
 import jakarta.ws.rs.WebApplicationException;
+import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 
@@ -68,6 +69,9 @@ public class DirectoryResource implements RestDirectory {
             //randomServer(f, filename, data);
 
             String name = String.format("%s/%s", userId, filename);
+
+          //  System.out.println("discovery data" + new String(data));
+
             files.writeFile(name, data,"");
 
             String uri = uris[number].toString();

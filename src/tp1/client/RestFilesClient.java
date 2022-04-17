@@ -48,15 +48,15 @@ public class RestFilesClient extends RestClient implements RestFiles {
 
     private void clt_writeFile(String fileId, byte[] data, String token) {
         Response r = target.path( fileId )
-                .queryParam("token", token)
+                .queryParam("token",token)
                 .request()
-                .accept(MediaType.APPLICATION_JSON)
+                //.accept(MediaType.APPLICATION_JSON)
                 .post(Entity.entity(data, MediaType.APPLICATION_OCTET_STREAM));
 
-        if( r.getStatus() == Response.Status.OK.getStatusCode() && r.hasEntity() )
+        if( r.getStatus() == Response.Status.NO_CONTENT.getStatusCode() )
             r.readEntity(FileInfo.class);
         else
-            System.out.println("Error, HTTP error status1: " + r.getStatus() );
+            System.out.println("Error, HTTP error status: " + r.getStatus() );
 
 
     }
