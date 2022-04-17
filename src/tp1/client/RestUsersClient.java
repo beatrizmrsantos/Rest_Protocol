@@ -97,9 +97,6 @@ public class RestUsersClient extends RestClient implements RestUsers {
 				.accept(MediaType.APPLICATION_JSON)
 				.get();
 
-		System.out.println(r.getStatus());
-		System.out.println(r.hasEntity());
-
 		if ( r.getStatus() == Status.OK.getStatusCode() && r.hasEntity() ) {
 			return r.readEntity(User.class);
 		} else {

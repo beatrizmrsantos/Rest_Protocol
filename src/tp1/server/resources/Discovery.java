@@ -126,9 +126,30 @@ public class Discovery {
 							}
 
 							ArrayList<URI> list = uris.get(serviceName);
-							list.add(uri);
+							boolean found = false;
 
-							uris.put(serviceName, list);
+							for (URI u: list) {
+								if(u.toString().equalsIgnoreCase(uri.toString())){
+									found = true;
+								}
+							}
+
+							if(!found){
+								list.add(uri);
+								uris.put(serviceName, list);
+							}
+
+							/*
+							System.out.println("nome do servico: " + serviceName);
+							System.out.println("quantidade de servicos no mapa: " + uris.size());
+							System.out.println("size da lista do servico: " + list.size());
+							for (URI u: list) {
+								System.out.print(u.toString() + ",   ");
+							}
+							System.out.println();
+							System.out.println();
+							*/
+
 						}
 					} catch (IOException e) {
 						e.printStackTrace();
@@ -161,6 +182,14 @@ public class Discovery {
 		for(int i = 0; i < array.size(); i++){
 			list[i] = array.get(i);
 		}
+
+		/*
+		System.out.println("Array do servico: ");
+		for (URI u: list) {
+			System.out.print(u.toString() + ",   ");
+		}
+		System.out.println();
+		 */
 
 		return list;
 	}	

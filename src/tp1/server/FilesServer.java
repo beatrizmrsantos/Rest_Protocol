@@ -38,7 +38,8 @@ public class FilesServer {
             String serverURI = String.format(SERVER_URI_FMT, ip, PORT);
 
             Discovery d = new Discovery(new InetSocketAddress("227.227.227.227", 2277), "files", serverURI);
-            d.start();
+            //d.start();
+            d.announce("files", serverURI);
 
             ResourceConfig config = new ResourceConfig();
 

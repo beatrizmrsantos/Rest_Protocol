@@ -39,7 +39,8 @@ public class DirectoryServer {
 
 
             Discovery d = new Discovery(new InetSocketAddress("227.227.227.227", 2277), "directory", serverURI);
-            d.start();
+            //d.start();
+            d.announce("directory", serverURI);
 
             ResourceConfig config = new ResourceConfig();
 

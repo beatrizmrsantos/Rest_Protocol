@@ -27,11 +27,14 @@ public class FileResource implements RestFiles {
 
     public FileResource(Discovery d) {
         this.d = d;
+        d.listener();
     }
 
     @Override
     public void writeFile(String fileId, byte[] data, String token) {
         Log.info("writeFile : fileId = " + fileId + "; data = " + data + "; token = " + token);
+
+        System.out.println("entrou em writeFileServidor");
 
         // Check if fileId is valid
         if(fileId == null) {

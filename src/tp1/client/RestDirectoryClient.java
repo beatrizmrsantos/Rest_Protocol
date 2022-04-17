@@ -86,6 +86,8 @@ public class RestDirectoryClient extends RestClient implements RestDirectory {
                            .accept(MediaType.APPLICATION_JSON)
                            .post(Entity.entity(data, MediaType.APPLICATION_OCTET_STREAM));
 
+        System.out.println("writeFileDir: " + r.getStatus());
+
         if( r.getStatus() == Response.Status.OK.getStatusCode() && r.hasEntity() ){
             return r.readEntity(FileInfo.class);
         } else {

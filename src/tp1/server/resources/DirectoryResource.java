@@ -56,7 +56,6 @@ public class DirectoryResource implements RestDirectory {
             RestFilesClient files = new RestFilesClient(uris[number]);
 
             String name = String.format("%s/%s", userId, filename);
-
             files.writeFile(name, data, "");
 
             return file;
@@ -70,7 +69,6 @@ public class DirectoryResource implements RestDirectory {
 
             String name = String.format("%s/%s", userId, filename);
             files.writeFile(name, data,"");
-
 
             String uri = uris[number].toString();
             String uriComplete = uri.concat("/files/" + userId + "/" + filename);
@@ -86,6 +84,15 @@ public class DirectoryResource implements RestDirectory {
 
             return i;
         }
+    }
+
+    private void printURI(URI[] uris){
+        System.out.println("uris do arrayURI: ");
+        for (URI u: uris) {
+            System.out.print(u.toString() + ",   ");
+        }
+
+        System.out.println();
     }
 
     /*

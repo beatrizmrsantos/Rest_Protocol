@@ -41,7 +41,6 @@ public class RestFilesClient extends RestClient implements RestFiles {
     @Override
     public byte[] getFile(String fileId, String token) {
         return super.reTry(()->{
-            System.out.println("getFile");
             return clt_getFile(fileId, token);
         });
     }
@@ -54,13 +53,11 @@ public class RestFilesClient extends RestClient implements RestFiles {
                 .accept(MediaType.APPLICATION_JSON)
                 .post(Entity.entity(data, MediaType.APPLICATION_OCTET_STREAM));
 
-        System.out.println(" write " +r.getStatus());
-        System.out.println(" write " +r.hasEntity());
-
         if( r.getStatus() == Response.Status.OK.getStatusCode() && r.hasEntity() )
             r.readEntity(FileInfo.class);
         else
-            System.out.println("Error, HTTP error status: " + r.getStatus() );
+            System.out.println("Error, HTTP error status1: " + r.getStatus() );
+
 
     }
 

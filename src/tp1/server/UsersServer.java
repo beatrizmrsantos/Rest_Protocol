@@ -40,7 +40,8 @@ public class UsersServer {
             String serverURI = String.format(SERVER_URI_FMT, ip, PORT);
 
             Discovery d = new Discovery(new InetSocketAddress("227.227.227.227", 2277), "users", serverURI);
-            d.start();
+            //d.start();
+            d.announce("users", serverURI);
 
             ResourceConfig config = new ResourceConfig();
 
