@@ -62,7 +62,7 @@ public class DirectoryResource implements RestDirectory {
         //randomServer(f, filename, data);
 
         String uri = f[number].toString();
-        String uriComplete = uri.concat("/files/"+userId+"/"+filename);
+        String uriComplete = uri.concat("/files/" + userId + "/" + filename);
 
         HashSet<String> set = new HashSet<>();
         FileInfo i = new FileInfo(userId, filename, uriComplete, set);

@@ -185,9 +185,11 @@ public class Discovery {
 		listener();
 	}
 
+	/*
 	// Main just for testing purposes
 	public static void main( String[] args) throws Exception {
 		Discovery discovery = new Discovery( DISCOVERY_ADDR, "test", "http://" + InetAddress.getLocalHost().getHostAddress());
 		discovery.start();
 	}
+	 */
 }
