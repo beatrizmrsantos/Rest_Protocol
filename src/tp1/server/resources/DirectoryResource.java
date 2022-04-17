@@ -38,6 +38,8 @@ public class DirectoryResource implements RestDirectory {
     public FileInfo writeFile(String filename, byte[] data, String userId, String password) {
         Log.info("writeFile : filename = " + filename + "; data = " + data + "; userId = " + userId + "; password = " + password);
 
+        System.out.println("write");
+
         URI[] u = d.knownUrisOf("users");
 
         RestUsersClient r = new RestUsersClient(u[0]);
@@ -53,15 +55,17 @@ public class DirectoryResource implements RestDirectory {
 
         int number = (int)Math.floor(Math.random()*(f.length-1));
 
+        System.out.println(f[number].toString());
+
         RestFilesClient files1 = new RestFilesClient(f[number]);
 
         //randomServer(f, filename, data);
 
-        String uri = f.toString();
-        uri.concat("/files/"+userId+"/"+filename);
+        String uri = f[number].toString();
+        String uriComplete = uri.concat("/files/"+userId+"/"+filename);
 
         HashSet<String> set = new HashSet<>();
-        FileInfo i = new FileInfo(userId, filename, uri, set);
+        FileInfo i = new FileInfo(userId, filename, uriComplete, set);
 
 
         if(userfiles.containsKey(userId)){
@@ -103,7 +107,7 @@ public class DirectoryResource implements RestDirectory {
 
     @Override
     public void deleteFile(String filename, String userId, String password) {
-        Log.info("writeFile : filename = " + filename + "; userId = " + userId + "; password = " + password);
+        Log.info("deleteFile : filename = " + filename + "; userId = " + userId + "; password = " + password);
 
         URI[] u = d.knownUrisOf("users");
 
@@ -127,7 +131,7 @@ public class DirectoryResource implements RestDirectory {
                 if (file.getFilename().equalsIgnoreCase(filename)) {
                     for (int j = 0; j < f.length; j++) {
 
-                        String uriS = f[j].toString().concat("/files/" + userId + "/" + filename);
+                        String uriS = f[j].toString().concat("/" + userId + "/" + filename);
                         if (file.getFileURL().equalsIgnoreCase(uriS)) {
                             uriCorrect = j;
                         }
@@ -151,7 +155,7 @@ public class DirectoryResource implements RestDirectory {
 
     @Override
     public void shareFile(String filename, String userId, String userIdShare, String password) {
-        Log.info("writeFile : filename = " + filename  + "; userId = " + userId  + "; userIdShare = " + userIdShare + "; password = " + password);
+        Log.info("shareFile : filename = " + filename  + "; userId = " + userId  + "; userIdShare = " + userIdShare + "; password = " + password);
 
         URI[] u = d.knownUrisOf("users");
 
@@ -200,7 +204,7 @@ public class DirectoryResource implements RestDirectory {
 
     @Override
     public void unshareFile(String filename, String userId, String userIdShare, String password) {
-        Log.info("writeFile : filename = " + filename  + "; userId = " + userId  + "; userIdShare = " + userIdShare + "; password = " + password);
+        Log.info("unshareFile : filename = " + filename  + "; userId = " + userId  + "; userIdShare = " + userIdShare + "; password = " + password);
 
 
         URI[] u = d.knownUrisOf("users");
@@ -247,9 +251,13 @@ public class DirectoryResource implements RestDirectory {
 
     @Override
     public byte[] getFile(String filename, String userId, String accUserId, String password) {
-        Log.info("writeFile : filename = " + filename + "; userId = " + userId + "; accUserId = " + accUserId + "; password = " + password);
+        Log.info("getFile : filename = " + filename + "; userId = " + userId + "; accUserId = " + accUserId + "; password = " + password);
 
         URI[] u = d.knownUrisOf("users");
+
+        System.out.println(u.length);
+        System.out.println(u[0].toString());
+
 
         RestUsersClient r = new RestUsersClient(u[0]);
 
@@ -275,11 +283,16 @@ public class DirectoryResource implements RestDirectory {
         boolean foundFile = false;
         String uri = null;
 
+        //System.out.println("inicio");
+
         if (userfiles.containsKey(userId)) {
             ArrayList<FileInfo> filesUser = userfiles.get(userId);
+           // System.out.println("esta mapa");
 
             for (int i = 0; i < filesUser.size(); i++) {
                 FileInfo file = filesUser.get(i);
+               // System.out.println(file.getFilename());
+                //System.out.println(String.format("%s/%s", userId, filename));
 
                 if (file.getFilename().equalsIgnoreCase(filename)) {
                     foundFile = true;
@@ -302,9 +315,9 @@ public class DirectoryResource implements RestDirectory {
         //RestFilesClient files = new RestFilesClient(f[uriCorrect]);
         //return files.getFile(filename, null);
 
-        if(uri != null){
-            uri.substring(0, uri.length() - 3);
-        }
+
+        String uriS = uri.substring(0, uri.length() - 3);
+
 
         throw new WebApplicationException(Response.temporaryRedirect(URI.create(uri)).build());
 
@@ -330,7 +343,7 @@ public class DirectoryResource implements RestDirectory {
 
     @Override
     public List<FileInfo> lsFile(String userId, String password) {
-        Log.info("writeFile : userId = " + userId  + "; password = " + password);
+        Log.info("lsFile : userId = " + userId  + "; password = " + password);
 
         URI[] u = d.knownUrisOf("users");
 

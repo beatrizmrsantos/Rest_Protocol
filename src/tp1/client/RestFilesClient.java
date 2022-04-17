@@ -2,6 +2,8 @@ package tp1.client;
 
 import java.net.URI;
 
+import jakarta.inject.Singleton;
+import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.GenericType;
@@ -22,6 +24,7 @@ public class RestFilesClient extends RestClient implements RestFiles {
     @Override
     public void writeFile(String fileId, byte[] data, String token) {
        super.reTry( () -> {
+           System.out.println("writeFile");
            clt_writeFile( fileId, data , token );
            return null;
         });
@@ -41,6 +44,7 @@ public class RestFilesClient extends RestClient implements RestFiles {
     @Override
     public byte[] getFile(String fileId, String token) {
         return super.reTry(()->{
+            System.out.println("getFile");
             return clt_getFile(fileId, token);
         });
     }
@@ -51,6 +55,9 @@ public class RestFilesClient extends RestClient implements RestFiles {
                 .queryParam("token", token).request()
                 .accept(MediaType.APPLICATION_JSON)
                 .post(Entity.entity(data, MediaType.APPLICATION_OCTET_STREAM));
+
+        System.out.println(" write " +r.getStatus());
+        System.out.println(" write " +r.hasEntity());
 
         if( r.getStatus() == Response.Status.OK.getStatusCode() && r.hasEntity() )
             r.readEntity(FileInfo.class);

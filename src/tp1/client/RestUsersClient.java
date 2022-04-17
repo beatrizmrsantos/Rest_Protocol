@@ -3,6 +3,7 @@ package tp1.client;
 import java.net.URI;
 import java.util.List;
 
+import jakarta.inject.Singleton;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.GenericType;
@@ -12,6 +13,7 @@ import jakarta.ws.rs.core.Response.Status;
 import tp1.api.User;
 import tp1.api.service.rest.RestUsers;
 
+@Singleton
 public class RestUsersClient extends RestClient implements RestUsers {
 
 	final WebTarget target;
@@ -32,6 +34,7 @@ public class RestUsersClient extends RestClient implements RestUsers {
 	public User getUser(String userId, String password) {
 		// TODO Auto-generated method stub
 		return super.reTry(()->{
+			System.out.println("getUser");
 			return clt_getUser(userId, password);
 		});
 	}
@@ -61,7 +64,6 @@ public class RestUsersClient extends RestClient implements RestUsers {
 
 
 	private String clt_createUser( User user) {
-		
 		Response r = target.request()
 				.accept(MediaType.APPLICATION_JSON)
 				.post(Entity.entity(user, MediaType.APPLICATION_JSON));
@@ -94,6 +96,9 @@ public class RestUsersClient extends RestClient implements RestUsers {
 				.queryParam("password", password).request()
 				.accept(MediaType.APPLICATION_JSON)
 				.get();
+
+		System.out.println(r.getStatus());
+		System.out.println(r.hasEntity());
 
 		if( r.getStatus() == Status.OK.getStatusCode() && r.hasEntity() ) {
 			return r.readEntity(User.class);

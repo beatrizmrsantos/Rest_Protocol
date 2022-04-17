@@ -33,6 +33,7 @@ public class FileResource implements RestFiles {
             throw new WebApplicationException( Status.BAD_REQUEST);
         }
 
+        System.out.println("escreve");
 
         // Check if token is valid
        /* if(token == null) {

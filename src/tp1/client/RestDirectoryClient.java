@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.inject.Singleton;
 import jakarta.ws.rs.client.Entity;
 import jakarta.ws.rs.client.WebTarget;
 import jakarta.ws.rs.core.GenericType;
@@ -15,7 +16,7 @@ import tp1.api.service.rest.RestUsers;
 import tp1.api.FileInfo;
 import tp1.api.service.rest.RestDirectory;
 
-
+@Singleton
 public class RestDirectoryClient extends RestClient implements RestDirectory {
 
     final WebTarget target;
@@ -133,7 +134,6 @@ public class RestDirectoryClient extends RestClient implements RestDirectory {
     }
 
     private byte[] clt_getFile(String filename, String userId, String userIdShare, String password ){
-
         Response r = target.path(userId).path(filename)
                            .queryParam("accUserId", userIdShare).queryParam("password", password).request()
                            .accept(MediaType.APPLICATION_OCTET_STREAM)

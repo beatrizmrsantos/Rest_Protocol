@@ -65,6 +65,7 @@ public class UsersResource implements RestUsers {
 
         // Check if user exists
         if (user == null) {
+            System.out.println("utilizador nao existe");
             Log.info("User does not exist.");
             throw new WebApplicationException(Status.NOT_FOUND);
         }
