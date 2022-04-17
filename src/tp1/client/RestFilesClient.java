@@ -24,13 +24,10 @@ public class RestFilesClient extends RestClient implements RestFiles {
     @Override
     public void writeFile(String fileId, byte[] data, String token) {
         super.reTry( () -> {
-           System.out.println("writeFile");
            clt_writeFile( fileId, data , token );
            return null;
        });
     }
-
-
 
     @Override
     public void deleteFile(String fileId, String token) {
@@ -80,19 +77,18 @@ public class RestFilesClient extends RestClient implements RestFiles {
 
     }
 
-
     private byte[] clt_getFile(String fileId, String token) {
         Response r = target.path( fileId )
                 .queryParam("token", token).request()
                 .accept(MediaType.APPLICATION_OCTET_STREAM)
                 .get();
 
-        if( r.getStatus() == Response.Status.OK.getStatusCode() && r.hasEntity() )
+        if ( r.getStatus() == Response.Status.OK.getStatusCode() && r.hasEntity() ) {
             return r.readEntity(new GenericType<byte[]>() {});
-        else
-            System.out.println("Error, HTTP error status: " + r.getStatus() );
-
-        return null;
+        } else {
+            System.out.println("Error, HTTP error status: " + r.getStatus());
+            return null;
+        }
     }
 }
 

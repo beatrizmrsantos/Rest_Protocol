@@ -33,8 +33,7 @@ public class UsersResource implements RestUsers {
         Log.info("createUser : " + user);
 
         // Check if user data is valid
-        if (user.getUserId() == null || user.getPassword() == null || user.getFullName() == null ||
-                user.getEmail() == null) {
+        if (user.getUserId() == null || user.getPassword() == null || user.getFullName() == null || user.getEmail() == null) {
             Log.info("User object invalid.");
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
@@ -44,7 +43,6 @@ public class UsersResource implements RestUsers {
             Log.info("User already exists.");
             throw new WebApplicationException(Status.CONFLICT);
         }
-
 
         //Add the user to the map of users
         users.put(user.getUserId(), user);
@@ -66,7 +64,6 @@ public class UsersResource implements RestUsers {
 
         // Check if user exists
         if (user == null) {
-            System.out.println("utilizador nao existe");
             Log.info("User does not exist.");
             throw new WebApplicationException(Status.NOT_FOUND);
         }
@@ -84,8 +81,6 @@ public class UsersResource implements RestUsers {
     @Override
     public User updateUser(String userId, String password, User user) {
         Log.info("updateUser : user = " + userId + "; pwd = " + password + " ; user = " + user);
-
-        // TODO Complete method
 
         if (userId == null  || user == null) {
             Log.info("UserId, password or user null.");
@@ -129,7 +124,6 @@ public class UsersResource implements RestUsers {
     @Override
     public User deleteUser(String userId, String password) {
         Log.info("deleteUser : user = " + userId + "; pwd = " + password);
-        // TODO Complete method
 
         if (userId == null) {
             Log.info("UserId is null.");
@@ -187,7 +181,7 @@ public class UsersResource implements RestUsers {
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
 
-        List<User> listUsers = new LinkedList<User>();
+        List<User> listUsers = new ArrayList<>();
 
         for (User u : users.values()) {
             String name = u.getFullName().toLowerCase();

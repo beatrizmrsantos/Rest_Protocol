@@ -38,57 +38,54 @@ public class DirectoryResource implements RestDirectory {
     public FileInfo writeFile(String filename, byte[] data, String userId, String password) {
         Log.info("writeFile : filename = " + filename + "; data = " + data + "; userId = " + userId + "; password = " + password);
 
-        System.out.println("write");
-
-        URI[] u = d.knownUrisOf("users");
-
-        RestUsersClient r = new RestUsersClient(u[0]);
-
-        User user = r.getUser(userId, password);
+        this.getUser(userId, password);
 
         if(filename == null) {
             Log.info("fileId is invalid.");
             throw new WebApplicationException( Status.BAD_REQUEST);
         }
 
-        URI[] f = d.knownUrisOf("files");
+        FileInfo file = this.getFileFromUser(userId, filename);
 
-        int number = (int)Math.floor(Math.random()*(f.length-1));
+        URI[] uris = d.knownUrisOf("files");
 
-        System.out.println(f[number].toString());
+        //se o ficheiro ja existe vai ao servidor e escreve por cima se nao cria ficheiro
+        if(file != null){
+            int number = this.getServerURIofFile(uris, userId, filename);
 
-        RestFilesClient files1 = new RestFilesClient(f[number]);
+            RestFilesClient files = new RestFilesClient(uris[number]);
 
-        //randomServer(f, filename, data);
+            String name = String.format("%s/%s", userId, filename);
 
-        String uri = f[number].toString();
-        String uriComplete = uri.concat("/files/" + userId + "/" + filename);
+            files.writeFile(name, data, "");
 
-        HashSet<String> set = new HashSet<>();
-        FileInfo i = new FileInfo(userId, filename, uriComplete, set);
+            return file;
 
-
-        if(userfiles.containsKey(userId)){
-            ArrayList<FileInfo> files = userfiles.get(userId);
-            if(!files.isEmpty()) {
-                for (FileInfo file : userfiles.get(userId)) {
-                    if (file.getFilename().equalsIgnoreCase(filename)) {
-                        userfiles.get(userId).remove(file);
-                    }
-                }
-            }
         } else {
-            userfiles.put(userId, new ArrayList<>());
+            int number = (int)Math.floor(Math.random()*(uris.length - 1));
+
+            RestFilesClient files = new RestFilesClient(uris[number]);
+
+            //randomServer(f, filename, data);
+
+            String name = String.format("%s/%s", userId, filename);
+            files.writeFile(name, data,"");
+
+
+            String uri = uris[number].toString();
+            String uriComplete = uri.concat("/files/" + userId + "/" + filename);
+
+            HashSet<String> set = new HashSet<>();
+            FileInfo i = new FileInfo(userId, filename, uriComplete, set);
+
+            if(!userfiles.containsKey(userId)){
+                userfiles.put(userId, new ArrayList<>());
+            }
+
+            userfiles.get(userId).add(i);
+
+            return i;
         }
-
-        userfiles.get(userId).add(i);
-
-        String name = String.format("/%s/%s", userId, filename);
-        System.out.println("faz pedido");
-
-        files1.writeFile(name, data,"");
-
-        return i;
     }
 
     /*
@@ -111,59 +108,79 @@ public class DirectoryResource implements RestDirectory {
     public void deleteFile(String filename, String userId, String password) {
         Log.info("deleteFile : filename = " + filename + "; userId = " + userId + "; password = " + password);
 
-        URI[] u = d.knownUrisOf("users");
-
-        RestUsersClient r = new RestUsersClient(u[0]);
-
-        User user = r.getUser(userId, password);
-
-        URI[] f = d.knownUrisOf("files");
+        this.getUser(userId, password);
 
         if(filename == null) {
             Log.info("fileId is invalid.");
             throw new WebApplicationException( Status.BAD_REQUEST);
         }
 
-        if(userfiles.containsKey(userId)) {
+        FileInfo file = getFileFromUser(userId, filename);
+
+        if( file == null){
+            Log.info("file does not exist or is not from the user.");
+            throw new WebApplicationException( Status.NOT_FOUND);
+        }
+
+        URI[] f = d.knownUrisOf("files");
+
+        int uriCorrect = getServerURIofFile(f, userId, filename);
+
+        RestFilesClient files = new RestFilesClient(f[uriCorrect]);
+
+        files.deleteFile(String.format("%s/%s", userId, filename), "");
+        userfiles.get(userId).remove(file);
+
+    }
+
+    private FileInfo getFileFromUser(String userId, String filename){
+        FileInfo file = null;
+
+        if(userfiles.containsKey(userId)){
             ArrayList<FileInfo> filesUser = userfiles.get(userId);
-            int uriCorrect = -1;
 
-            for (int i = 0; i < filesUser.size(); i++) {
-                FileInfo file = filesUser.get(i);
-                if (file.getFilename().equalsIgnoreCase(filename)) {
-                    for (int j = 0; j < f.length; j++) {
+            for (FileInfo f: filesUser) {
+                if (f.getFilename().equalsIgnoreCase(filename)) {
+                    file = f;
+                }
+            }
+        }
 
-                        String uriS = f[j].toString().concat("/" + userId + "/" + filename);
-                        if (file.getFileURL().equalsIgnoreCase(uriS)) {
-                            uriCorrect = j;
-                        }
+        return file;
+    }
+
+    private void getUser(String userId, String password){
+        URI[] u = d.knownUrisOf("users");
+
+        RestUsersClient r = new RestUsersClient(u[0]);
+
+        r.getUser(userId, password);
+    }
+
+    private int getServerURIofFile(URI[] uris, String userId, String filename){
+        ArrayList<FileInfo> filesUser = userfiles.get(userId);
+        int uriCorrect = -1;
+
+        for (FileInfo file: filesUser) {
+            if (file.getFilename().equalsIgnoreCase(filename)) {
+
+                for (int j = 0; j < uris.length; j++) {
+                    String uriString = uris[j].toString().concat("/" + userId + "/" + filename);
+
+                    if (file.getFileURL().equalsIgnoreCase(uriString)) {
+                        uriCorrect = j;
                     }
                 }
             }
-            RestFilesClient files = new RestFilesClient(f[uriCorrect]);
-
-            for (FileInfo file: userfiles.get(userId)) {
-                if(file.getFilename().equalsIgnoreCase(filename)){
-
-                    files.deleteFile(String.format("%s/%s", userId, filename), "");
-
-                    userfiles.get(userId).remove(file);
-                }
-            }
-
         }
-
+        return uriCorrect;
     }
 
     @Override
     public void shareFile(String filename, String userId, String userIdShare, String password) {
         Log.info("shareFile : filename = " + filename  + "; userId = " + userId  + "; userIdShare = " + userIdShare + "; password = " + password);
 
-        URI[] u = d.knownUrisOf("users");
-
-        RestUsersClient r = new RestUsersClient(u[0]);
-
-        User user = r.getUser(userId, password);
+        this.getUser(userId, password);
 
         /*
         List<User> l = r.searchUsers(userIdShare);
@@ -182,25 +199,17 @@ public class DirectoryResource implements RestDirectory {
             throw new WebApplicationException( Status.BAD_REQUEST);
         }
 
-        boolean found = false;
-        for (FileInfo file: userfiles.get(userId)) {
-            if(file.getFilename().equalsIgnoreCase(filename)){
+        FileInfo file = this.getFileFromUser(userId, filename);
 
-                Set<String> shared = file.getSharedWith();
-                shared.add(userIdShare);
-
-                file.setSharedWith(shared);
-
-                found = true;
-
-            }
-        }
-
-        if(!found){
-            Log.info("File does not exist.");
+        if( file == null){
+            Log.info("file does not exist or is not from the user.");
             throw new WebApplicationException( Status.NOT_FOUND);
         }
 
+        Set<String> shared = file.getSharedWith();
+        shared.add(userIdShare);
+
+        file.setSharedWith(shared);
 
     }
 
@@ -208,12 +217,7 @@ public class DirectoryResource implements RestDirectory {
     public void unshareFile(String filename, String userId, String userIdShare, String password) {
         Log.info("unshareFile : filename = " + filename  + "; userId = " + userId  + "; userIdShare = " + userIdShare + "; password = " + password);
 
-
-        URI[] u = d.knownUrisOf("users");
-
-        RestUsersClient r = new RestUsersClient(u[0]);
-
-        User user = r.getUser(userId, password);
+        this.getUser(userId, password);
 
         /*
         List<User> l = r.searchUsers(userIdShare);
@@ -232,22 +236,17 @@ public class DirectoryResource implements RestDirectory {
             throw new WebApplicationException( Status.BAD_REQUEST);
         }
 
-        boolean found = false;
-        for (FileInfo file: userfiles.get(userId)) {
-            if(file.getFilename().equalsIgnoreCase(filename)){
+        FileInfo file = this.getFileFromUser(userId, filename);
 
-                Set<String> shared = file.getSharedWith();
-                shared.remove(userIdShare);
-
-                file.setSharedWith(shared);
-                found = true;
-            }
-        }
-
-        if(!found){
-            Log.info("File does not exist.");
+        if( file == null){
+            Log.info("file does not exist or is not from the user.");
             throw new WebApplicationException( Status.NOT_FOUND);
         }
+
+        Set<String> shared = file.getSharedWith();
+        shared.remove(userIdShare);
+
+        file.setSharedWith(shared);
 
     }
 
@@ -255,15 +254,7 @@ public class DirectoryResource implements RestDirectory {
     public byte[] getFile(String filename, String userId, String accUserId, String password) {
         Log.info("getFile : filename = " + filename + "; userId = " + userId + "; accUserId = " + accUserId + "; password = " + password);
 
-        URI[] u = d.knownUrisOf("users");
-
-        System.out.println(u.length);
-        System.out.println(u[0].toString());
-
-
-        RestUsersClient r = new RestUsersClient(u[0]);
-
-        User user = r.getUser(userId, password);
+        this.getUser(userId, password);
 
         /*
         List<User> l = r.searchUsers(accUserId);
@@ -282,44 +273,23 @@ public class DirectoryResource implements RestDirectory {
             throw new WebApplicationException( Status.BAD_REQUEST);
         }
 
-        boolean foundFile = false;
-        String uri = null;
+        FileInfo file = this.getFileFromUser(userId, filename);
 
-        //System.out.println("inicio");
-
-        if (userfiles.containsKey(userId)) {
-            ArrayList<FileInfo> filesUser = userfiles.get(userId);
-           // System.out.println("esta mapa");
-
-            for (int i = 0; i < filesUser.size(); i++) {
-                FileInfo file = filesUser.get(i);
-               // System.out.println(file.getFilename());
-                //System.out.println(String.format("%s/%s", userId, filename));
-
-                if (file.getFilename().equalsIgnoreCase(filename)) {
-                    foundFile = true;
-                    uri = file.getFileURL();
-
-                    if (!checkUserAccessability(accUserId, file)) {
-                        Log.info("User does not have permission to see file.");
-                        throw new WebApplicationException( Status.FORBIDDEN);
-                    }
-
-                }
-            }
+        if( file == null){
+            Log.info("file does not exist or is not from the user.");
+            throw new WebApplicationException( Status.NOT_FOUND);
         }
 
-        if (!foundFile) {
-            Log.info("File does not exist.");
-            throw new WebApplicationException( Status.NOT_FOUND);
+        if (!checkUserAccessability(accUserId, file)) {
+            Log.info("User does not have permission to see file.");
+            throw new WebApplicationException( Status.FORBIDDEN);
         }
 
         //RestFilesClient files = new RestFilesClient(f[uriCorrect]);
         //return files.getFile(filename, null);
 
-
-        String uriS = uri.substring(0, uri.length() - 3);
-
+        String uri = file.getFileURL();
+        //String uriS = uri.substring(0, uri.length() - 3);
 
         throw new WebApplicationException(Response.temporaryRedirect(URI.create(uri)).build());
 
@@ -328,33 +298,44 @@ public class DirectoryResource implements RestDirectory {
 
     private boolean checkUserAccessability(String userId, FileInfo file){
         Set<String> list = file.getSharedWith();
-        boolean b = false;
+        boolean found = false;
 
         for (String s: list) {
             if(userId.equalsIgnoreCase(s)){
-                b = true;
+                found = true;
+                break;
             }
         }
 
         if(file.getOwner().equalsIgnoreCase(userId)){
-            b = true;
+            found = true;
         }
 
-        return b;
+        return found;
     }
 
     @Override
     public List<FileInfo> lsFile(String userId, String password) {
         Log.info("lsFile : userId = " + userId  + "; password = " + password);
 
-        URI[] u = d.knownUrisOf("users");
+        this.getUser(userId, password);
 
-        RestUsersClient r = new RestUsersClient(u[0]);
+        List<FileInfo> listFiles = new ArrayList<>();
 
-        User user = r.getUser(userId, password);
+        //adds all the files the user has acess with because they are shared to him or are his files
+        for(int i = 0; i < userfiles.size(); i++){
+            ArrayList<FileInfo> files = userfiles.get(i);
 
-        return userfiles.get(userId);
+            for (FileInfo f: files) {
+                if(checkUserAccessability(userId, f)){
+                    listFiles.add(f);
+                }
+            }
+        }
+
+        return listFiles;
     }
+
 
     @Override
     public void deleteUserAndFiles(String userId, String password){
@@ -362,9 +343,8 @@ public class DirectoryResource implements RestDirectory {
         if(userfiles.containsKey(userId)){
             ArrayList<FileInfo> list = userfiles.get(userId);
 
-            for(int i = 0; i < list.size(); i++){
-                FileInfo file = list.get(i);
-                this.deleteFile(file.getFilename(), userId, password);
+            for (FileInfo f: list) {
+                this.deleteFile(f.getFilename(), userId, password);
             }
 
             userfiles.remove(userId);
@@ -377,11 +357,13 @@ public class DirectoryResource implements RestDirectory {
         for(int i = 0; i < userfiles.size(); i++){
             ArrayList<FileInfo> files = userfiles.get(i);
 
-            for(int j = 0; j < files.size(); j++){
-                Set<String> shared = files.get(j).getSharedWith();
+            for (FileInfo f: files) {
+                Set<String> shared = f.getSharedWith();
                 shared.remove(id);
-                userfiles.get(i).get(j).setSharedWith(shared);
+                f.setSharedWith(shared);
             }
         }
     }
+
+
 }

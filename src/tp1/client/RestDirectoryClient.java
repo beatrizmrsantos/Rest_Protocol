@@ -86,12 +86,12 @@ public class RestDirectoryClient extends RestClient implements RestDirectory {
                            .accept(MediaType.APPLICATION_JSON)
                            .post(Entity.entity(data, MediaType.APPLICATION_OCTET_STREAM));
 
-        if( r.getStatus() == Response.Status.OK.getStatusCode() && r.hasEntity() )
+        if( r.getStatus() == Response.Status.OK.getStatusCode() && r.hasEntity() ){
             return r.readEntity(FileInfo.class);
-        else
-            System.out.println("Error, HTTP error status: " + r.getStatus() );
-
-        return null;
+        } else {
+            System.out.println("Error, HTTP error status: " + r.getStatus());
+            return null;
+        }
     }
 
     private void clt_deleteFile(String filename, String userId, String password ){
@@ -100,7 +100,7 @@ public class RestDirectoryClient extends RestClient implements RestDirectory {
                            .queryParam("password", password).request()
                            .delete();
 
-        if( r.getStatus() == Response.Status.OK.getStatusCode() && r.hasEntity() )
+        if ( r.getStatus() == Response.Status.OK.getStatusCode() && r.hasEntity() )
            r.readEntity(FileInfo.class);
         else
             System.out.println("Error, HTTP error status: " + r.getStatus() );
@@ -139,12 +139,13 @@ public class RestDirectoryClient extends RestClient implements RestDirectory {
                            .accept(MediaType.APPLICATION_OCTET_STREAM)
                            .get();
 
-        if( r.getStatus() == Response.Status.OK.getStatusCode() && r.hasEntity() )
-            return r.readEntity(new GenericType<byte[]>() {});
-        else
-            System.out.println("Error, HTTP error status: " + r.getStatus() );
-
-        return null;
+        if( r.getStatus() == Response.Status.OK.getStatusCode() && r.hasEntity() ) {
+            return r.readEntity(new GenericType<byte[]>() {
+            });
+        } else {
+            System.out.println("Error, HTTP error status: " + r.getStatus());
+            return null;
+        }
     }
 
     private List<FileInfo> clt_lsFile(String userId, String password){
@@ -154,19 +155,20 @@ public class RestDirectoryClient extends RestClient implements RestDirectory {
                            .accept(MediaType.APPLICATION_JSON)
                            .get();
 
-        if( r.getStatus() == Response.Status.OK.getStatusCode() && r.hasEntity() )
-            return r.readEntity(new GenericType<List<FileInfo>>() {});
-        else
-            System.out.println("Error, HTTP error status: " + r.getStatus() );
-
-        return null;
+        if ( r.getStatus() == Response.Status.OK.getStatusCode() && r.hasEntity() ) {
+            return r.readEntity(new GenericType<List<FileInfo>>() {
+            });
+        } else {
+            System.out.println("Error, HTTP error status: " + r.getStatus());
+            return null;
+        }
     }
 
     private void clt_deleteUserAndFiles( String userId, String password){
         Response r = target.path(userId).queryParam("password", password)
                     .request().delete();
 
-        if( r.getStatus() == Response.Status.OK.getStatusCode() && r.hasEntity() )
+        if ( r.getStatus() == Response.Status.OK.getStatusCode() && r.hasEntity() )
             r.readEntity(FileInfo.class);
         else
             System.out.println("Error, HTTP error status: " + r.getStatus() );

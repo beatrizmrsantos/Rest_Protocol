@@ -34,7 +34,6 @@ public class RestUsersClient extends RestClient implements RestUsers {
 	public User getUser(String userId, String password) {
 		// TODO Auto-generated method stub
 		return super.reTry(()->{
-			System.out.println("getUser");
 			return clt_getUser(userId, password);
 		});
 	}
@@ -68,12 +67,13 @@ public class RestUsersClient extends RestClient implements RestUsers {
 				.accept(MediaType.APPLICATION_JSON)
 				.post(Entity.entity(user, MediaType.APPLICATION_JSON));
 
-		if( r.getStatus() == Status.OK.getStatusCode() && r.hasEntity() )
+		if( r.getStatus() == Status.OK.getStatusCode() && r.hasEntity() ){
 			return r.readEntity(String.class);
-		else 
-			System.out.println("Error, HTTP error status: " + r.getStatus() );
-		
-		return null;
+		} else {
+			System.out.println("Error, HTTP error status: " + r.getStatus());
+			return null;
+		}
+
 	}
 	
 	private List<User> clt_searchUsers(String pattern) {
@@ -83,12 +83,12 @@ public class RestUsersClient extends RestClient implements RestUsers {
 				.accept(MediaType.APPLICATION_JSON)
 				.get();
 
-		if( r.getStatus() == Status.OK.getStatusCode() && r.hasEntity() )
+		if( r.getStatus() == Status.OK.getStatusCode() && r.hasEntity() ) {
 			return r.readEntity(new GenericType<List<User>>() {});
-		else 
-			System.out.println("Error, HTTP error status: " + r.getStatus() );
-		
-		return null;
+		} else {
+			System.out.println("Error, HTTP error status: " + r.getStatus());
+			return null;
+		}
 	}
 
 	private User clt_getUser(String userId, String password){
@@ -100,9 +100,9 @@ public class RestUsersClient extends RestClient implements RestUsers {
 		System.out.println(r.getStatus());
 		System.out.println(r.hasEntity());
 
-		if( r.getStatus() == Status.OK.getStatusCode() && r.hasEntity() ) {
+		if ( r.getStatus() == Status.OK.getStatusCode() && r.hasEntity() ) {
 			return r.readEntity(User.class);
-		}else{
+		} else {
 			System.out.println("Error, HTTP error status: " + r.getStatus() );
 			return null;
 		}
@@ -115,9 +115,9 @@ public class RestUsersClient extends RestClient implements RestUsers {
 				.accept(MediaType.APPLICATION_JSON)
 				.put(Entity.entity(user, MediaType.APPLICATION_JSON));
 
-		if( r.getStatus() == Status.OK.getStatusCode() && r.hasEntity() ) {
+		if ( r.getStatus() == Status.OK.getStatusCode() && r.hasEntity() ) {
 			return r.readEntity(User.class);
-		}else{
+		} else {
 			System.out.println("Error, HTTP error status: " + r.getStatus() );
 			return null;
 		}
@@ -129,9 +129,9 @@ public class RestUsersClient extends RestClient implements RestUsers {
 				.accept(MediaType.APPLICATION_JSON)
 				.delete();
 
-		if( r.getStatus() == Status.OK.getStatusCode() && r.hasEntity() ) {
+		if ( r.getStatus() == Status.OK.getStatusCode() && r.hasEntity() ) {
 			return r.readEntity(User.class);
-		}else{
+		} else {
 			System.out.println("Error, HTTP error status: " + r.getStatus() );
 			return null;
 		}
