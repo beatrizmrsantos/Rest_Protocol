@@ -45,7 +45,6 @@ public class UsersResource implements RestUsers {
             throw new WebApplicationException(Status.CONFLICT);
         }
 
-        System.out.println(user.getUserId());
 
         //Add the user to the map of users
         users.put(user.getUserId(), user);
