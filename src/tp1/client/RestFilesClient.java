@@ -52,7 +52,8 @@ public class RestFilesClient extends RestClient implements RestFiles {
 
     private void clt_writeFile(String fileId, byte[] data, String token) {
         Response r = target.path( fileId )
-                .queryParam(token).request()
+                .queryParam(token)
+                .request()
                 .accept(MediaType.APPLICATION_JSON)
                 .post(Entity.entity(data, MediaType.APPLICATION_OCTET_STREAM));
 
