@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 
 public class FileResource implements RestFiles {
 
-    private final Map<String, byte[]> files = new HashMap<>();
+    //private final Map<String, byte[]> files = new HashMap<>();
 
     private static Logger Log = Logger.getLogger(FileResource.class.getName());
 
@@ -31,7 +31,7 @@ public class FileResource implements RestFiles {
 
     @Override
     public void writeFile(String fileId, byte[] data, String token) {
-        Log.info("writeFile : fileId = " + fileId + "; data = "+data+ "; token = " + token);
+        Log.info("writeFile : fileId = " + fileId + "; data = " + data + "; token = " + token);
 
         // Check if fileId is valid
         if(fileId == null) {
@@ -40,15 +40,18 @@ public class FileResource implements RestFiles {
         }
 
         try {
-            FileWriter file = new FileWriter(fileId);
-            file.write(data.toString());
-            file.close();
+            Path path = Paths.get(fileId);
 
+            if(Files.exists(path)) {
+                Files.delete(path);
+            }
+
+            Files.write(path, data);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            Log.info("Error writing the file.");
+            throw new WebApplicationException( Status.BAD_REQUEST);
         }
-
 
         // Check if token is valid
        /* if(token == null) {
@@ -76,15 +79,21 @@ public class FileResource implements RestFiles {
             throw new WebApplicationException( Status.NOT_FOUND);
         }*/
 
-        File file = new File(fileId);
+        try {
+            Path path = Paths.get(fileId);
 
-        //file.delete();
+            if(Files.exists(path)) {
+                Files.delete(path);
+            } else {
+                Log.info("file does not exist.");
+                throw new WebApplicationException( Status.NOT_FOUND);
+            }
 
-
-        if(!file.delete()){
-            Log.info("fileId does not exist.");
-            throw new WebApplicationException( Status.NOT_FOUND);
+        } catch (IOException e) {
+            Log.info("Error writing the file.");
+            throw new WebApplicationException( Status.BAD_REQUEST);
         }
+
 
         // Check if token is valid
         /*if(token == null) {
@@ -106,12 +115,6 @@ public class FileResource implements RestFiles {
             throw new WebApplicationException( Status.BAD_REQUEST);
         }
 
-        File f = new File(fileId);
-
-        if(!f.exists()){
-            Log.info("fileId does not exist.");
-            throw new WebApplicationException( Status.NOT_FOUND);
-        }
         /*
         if(!files.containsKey(fileId)){
             Log.info("fileId does not exist.");
@@ -119,13 +122,19 @@ public class FileResource implements RestFiles {
         }*/
 
         try {
+            Path path = Paths.get(fileId);
 
-            byte[] content = Files.readAllBytes(Path.of(f.getAbsolutePath()));
+            if(!Files.exists(path)) {
+                Log.info("file does not exist.");
+                throw new WebApplicationException( Status.NOT_FOUND);
+            }
+
+            byte[] content = Files.readAllBytes(path);
             return content;
 
         } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+            Log.info("Error writing the file.");
+            throw new WebApplicationException( Status.BAD_REQUEST);
         }
 
         // Check if token is valid
@@ -133,7 +142,6 @@ public class FileResource implements RestFiles {
             Log.info("token is invalid.");
             throw new WebApplicationException( Status.FORBIDDEN );
         }*/
-
 
     }
 }
