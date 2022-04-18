@@ -34,14 +34,6 @@ public class FileResource implements RestFiles {
     public void writeFile(String fileId, byte[] data, String token) {
         Log.info("writeFile : fileId = " + fileId + "; data = " + data + "; token = " + token);
 
-        System.out.println("entrou em writeFileServidor");
-
-        // Check if fileId is valid
-        if(fileId == null) {
-            Log.info("fileId is invalid.");
-            throw new WebApplicationException( Status.BAD_REQUEST);
-        }
-
         try {
             Path path = Paths.get(fileId);
 

@@ -22,6 +22,7 @@ import tp1.client.RestUsersClient;
 public class DirectoryResource implements RestDirectory {
 
     private final Map<String, ArrayList<FileInfo>> userfiles = new HashMap<>();
+    private  Map<URI, Integer> filesServers = new HashMap<>();
 
     private FileResource f;
     private UsersResource u;
@@ -59,23 +60,26 @@ public class DirectoryResource implements RestDirectory {
             String name = String.format("%s.%s", userId, filename);
             files.writeFile(name, data, "");
 
+            int n = filesServers.get(uris[number]) + 1;
+
+            filesServers.put(uris[number], n);
+
             return file;
 
         } else {
-            int number = (int)Math.floor(Math.random()*(uris.length - 1));
+           /* int number = randomServer(uris);
 
             RestFilesClient files = new RestFilesClient(uris[number]);
 
-            //randomServer(f, filename, data);
+            //randomServer(f, filename, data , userId);
 
             String name = String.format("%s.%s", userId, filename);
 
-          //  System.out.println("discovery data" + new String(data));
+            files.writeFile(name, data,"");*/
 
-            files.writeFile(name, data,"");
-
-            String uri = uris[number].toString();
-            String uriComplete = uri.concat("/files/" + userId + "." + filename);
+            URI uri = tryServer(chooseServer(uris), filename, data, null, userId);
+            String uriString = uri.toString();
+            String uriComplete = uriString.concat("/files/" + userId + "." + filename);
 
             HashSet<String> set = new HashSet<>();
             FileInfo i = new FileInfo(userId, filename, uriComplete, set);
@@ -83,6 +87,9 @@ public class DirectoryResource implements RestDirectory {
             if(!userfiles.containsKey(userId)){
                 userfiles.put(userId, new ArrayList<>());
             }
+
+            int value = filesServers.get(uri) + 1;
+            filesServers.put(uri, value);
 
             userfiles.get(userId).add(i);
 
@@ -100,9 +107,20 @@ public class DirectoryResource implements RestDirectory {
     }
 
 
-    private void randomServer(URI[] f, String filename, byte[] data){
-        int number = (int)Math.floor(Math.random()*(f.length));
+    private Iterator<Map.Entry<URI, Integer>> chooseServer(URI[] f){
+        for(int i = 0; i < f.length;i++){
+            if(!filesServers.containsKey(f[i])) {
+                filesServers.put(f[i], 0);
+            }
+        }
 
+        Map<URI, Integer> m = sortByValue(filesServers);
+        filesServers = m;
+
+        return filesServers.entrySet().iterator();
+
+
+        /*
         for(int i = 0; i < 3 ;i++) {
             RestFilesClient files = new RestFilesClient(f[number]);
 
@@ -112,7 +130,43 @@ public class DirectoryResource implements RestDirectory {
             }catch (Exception x){
                 number = (int)Math.floor(Math.random()*(f.length));
             }
+        }*/
+    }
+
+
+    private URI tryServer (Iterator<Map.Entry<URI, Integer>> map, String filename, byte[] data, String token, String userId){
+        Iterator<Map.Entry<URI, Integer>> m = map;
+        Map.Entry<URI, Integer> entry = m.next();
+
+        String name = String.format("%s.%s", userId, filename);
+
+        for(int i = 0; i < 3 ;i++) {
+            RestFilesClient files = new RestFilesClient(entry.getKey());
+
+            try {
+                files.writeFile(name, data,"");
+                break;
+            }catch (Exception x){
+               if(m.hasNext()){
+                   entry = m.next();
+               }
+            }
         }
+
+        return entry.getKey();
+    }
+
+    public static <K, V extends Comparable<? super V>> Map<K, V> sortByValue(Map<K, V> map) {
+        List<Map.Entry<K, V>> list = new ArrayList<>(map.entrySet());
+        list.sort(Map.Entry.comparingByValue());
+
+        Map<K, V> result = new LinkedHashMap<>();
+        for (Map.Entry<K, V> entry : list) {
+            result.put(entry.getKey(), entry.getValue());
+        }
+
+        return result;
+
     }
 
     @Override

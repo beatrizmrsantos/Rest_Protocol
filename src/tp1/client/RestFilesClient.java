@@ -23,10 +23,7 @@ public class RestFilesClient extends RestClient implements RestFiles {
 
     @Override
     public void writeFile(String fileId, byte[] data, String token) {
-        super.reTry( () -> {
            clt_writeFile( fileId, data , token );
-           return null;
-       });
     }
 
     @Override
