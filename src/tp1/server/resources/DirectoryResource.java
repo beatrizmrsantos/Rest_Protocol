@@ -56,7 +56,7 @@ public class DirectoryResource implements RestDirectory {
 
             RestFilesClient files = new RestFilesClient(uris[number]);
 
-            String name = String.format("%s/%s", userId, filename);
+            String name = String.format("%s.%s", userId, filename);
             files.writeFile(name, data, "");
 
             return file;
@@ -68,14 +68,14 @@ public class DirectoryResource implements RestDirectory {
 
             //randomServer(f, filename, data);
 
-            String name = String.format("%s/%s", userId, filename);
+            String name = String.format("%s.%s", userId, filename);
 
           //  System.out.println("discovery data" + new String(data));
 
             files.writeFile(name, data,"");
 
             String uri = uris[number].toString();
-            String uriComplete = uri.concat("/files/" + userId + "/" + filename);
+            String uriComplete = uri.concat("/files/" + userId + "." + filename);
 
             HashSet<String> set = new HashSet<>();
             FileInfo i = new FileInfo(userId, filename, uriComplete, set);
@@ -139,7 +139,7 @@ public class DirectoryResource implements RestDirectory {
 
         RestFilesClient files = new RestFilesClient(f[uriCorrect]);
 
-        files.deleteFile(String.format("%s/%s", userId, filename), "");
+        files.deleteFile(String.format("%s.%s", userId, filename), "");
         userfiles.get(userId).remove(file);
 
     }
@@ -160,12 +160,14 @@ public class DirectoryResource implements RestDirectory {
         return file;
     }
 
-    private void getUser(String userId, String password){
+    private User getUser(String userId, String password){
         URI[] u = d.knownUrisOf("users");
 
         RestUsersClient r = new RestUsersClient(u[0]);
 
-        r.getUser(userId, password);
+        System.out.println("resource " + password);
+
+        return r.getUser(userId, password);
     }
 
     private int getServerURIofFile(URI[] uris, String userId, String filename){
@@ -176,7 +178,7 @@ public class DirectoryResource implements RestDirectory {
             if (file.getFilename().equalsIgnoreCase(filename)) {
 
                 for (int j = 0; j < uris.length; j++) {
-                    String uriString = uris[j].toString().concat("/" + userId + "/" + filename);
+                    String uriString = uris[j].toString().concat("/" + userId + "." + filename);
 
                     if (file.getFileURL().equalsIgnoreCase(uriString)) {
                         uriCorrect = j;

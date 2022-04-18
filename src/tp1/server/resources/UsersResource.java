@@ -56,9 +56,11 @@ public class UsersResource implements RestUsers {
 
         // Check if user is valid
         if (userId == null) {
-            Log.info("UserId or passwrod null.");
+            Log.info("UserId is null.");
             throw new WebApplicationException(Status.BAD_REQUEST);
         }
+
+        System.out.println("user  " + password);
 
         User user = users.get(userId);
 
