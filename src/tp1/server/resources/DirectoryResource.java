@@ -99,7 +99,7 @@ public class DirectoryResource implements RestDirectory {
         System.out.println();
     }
 
-    /*
+
     private void randomServer(URI[] f, String filename, byte[] data){
         int number = (int)Math.floor(Math.random()*(f.length));
 
@@ -113,7 +113,7 @@ public class DirectoryResource implements RestDirectory {
                 number = (int)Math.floor(Math.random()*(f.length));
             }
         }
-    }*/
+    }
 
     @Override
     public void deleteFile(String filename, String userId, String password) {

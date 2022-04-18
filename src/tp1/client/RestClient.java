@@ -14,11 +14,11 @@ import jakarta.ws.rs.client.ClientBuilder;
 public class RestClient {
 	private static Logger Log = Logger.getLogger(RestClient.class.getName());
 
-	protected static final int READ_TIMEOUT = 5000;
-	protected static final int CONNECT_TIMEOUT = 5000;
+	protected static final int READ_TIMEOUT = 10000;
+	protected static final int CONNECT_TIMEOUT = 10000;
 
-	protected static final int RETRY_SLEEP = 3000;
-	protected static final int MAX_RETRIES = 4;
+	protected static final int RETRY_SLEEP = 1000;
+	protected static final int MAX_RETRIES = 3;
 
 	final URI serverURI;
 	final Client client;
@@ -46,6 +46,7 @@ public class RestClient {
 				x.printStackTrace();
 				break;
 			}
+		//return timeout
 		return null;
 	}
 
